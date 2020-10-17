@@ -1,0 +1,24 @@
+{
+  "name": "prettier-plugin-brs",
+  "version": "0.0.1",
+  "description": "Make your brs prettier.",
+  "main": "lib/index.js",
+  "author": "Nicco Simone",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^14.11.2",
+    "@types/prettier": "^2.1.1",
+    "jest": "^26.4.2",
+    "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "brs": "nightly",
+    "prettier": "^2.1.2"
+  }
+}
