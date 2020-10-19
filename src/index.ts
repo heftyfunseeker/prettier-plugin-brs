@@ -32,18 +32,21 @@ function printLiteral(path: any, options: any, print: Function) {
     return valueString;
 }
 
-// A little hard to parse this unless you understand how builders.group
-// and builders.line work together. Line tries to fit everything within a group
-// within options.printWidth. If it can't, we get line breaks with indentation
 function printArrayLiteral(path: any, options: any, print: Function) {
     return builders.group(
-        builders.indent(
-            builders.concat(['[',
-                builders.join(
-                    builders.concat([',', builders.line]), path.map(print, 'elements')
-                ),
-            ']'])
-        )
+        builders.concat([
+            '[',
+            builders.indent(
+                builders.concat([
+                    builders.softline,
+                    builders.join(
+                        builders.concat([',', builders.line]), path.map(print, 'elements')
+                    )
+                ])
+            ),
+            builders.softline,
+            ']'
+        ])
     )
 }
 

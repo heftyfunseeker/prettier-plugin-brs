@@ -39,7 +39,7 @@ describe('Assignment', () => {
     });
 
     test('formats line breaks of array', () => {
-        let code = 'a = [0, ["blah", false], invalid]\n'
+        let code = `a = [\n  0,\n  ["blah", false],\n  invalid\n]\n`
         expect(format(code, { printWidth: 20})).toBe(code)
     });
 })
