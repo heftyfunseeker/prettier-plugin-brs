@@ -42,4 +42,28 @@ describe('Assignment', () => {
         let code = `a = [\n  0,\n  ["blah", false],\n  invalid\n]\n`
         expect(format(code, { printWidth: 20})).toBe(code)
     });
+
+    test('formats AA literals', () => {
+        let code = 'a = { blah: "foo" }\n'
+        expect(format(code)).toBe(code)
+    });
+
+    test('formats nested AA literals', () => {
+        code = 'a = { blah: [1, 2, 3] }\n'
+        expect(format(code)).toBe(code)
+
+        code = 'a = { blah: { foo: 2, bar: "some string" } }\n'
+        expect(format(code)).toBe(code)
+    });
+
+    // a = {
+    //     blah: {
+    //         foo: 2,
+    //         bar: "some string"
+    //     }
+    // }
+    test('formats line breaks of AA literals', () => {
+        code = 'a = {\n  blah: {\n    foo: 2,\n    bar: "some string"\n  }\n}\n'
+        expect(format(code, { printWidth: 20 })).toBe(code)
+    });
 })

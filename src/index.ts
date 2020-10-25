@@ -1,4 +1,5 @@
 import { parser, lexer, preprocessor, types } from "brs"
+import { AAMember } from "brs/types/parser/Expression";
 import prettier = require('prettier')
 
 function parse(code: string, options: any): object {
@@ -10,9 +11,8 @@ function parse(code: string, options: any): object {
     return ast[0];
 }
 
-function prettyPrintBrs(path: any, options: any, print: Function) {
+function printBrs(path: any, options: any, print: Function) {
     let node = path.getValue();
-    // @nicco: check ast spec - "pretty" sure brs represents a single file's contents as a tree
     return nodeTypeToPrint[node.type](path, options, print);
 }
 
@@ -23,7 +23,7 @@ function printAssignment(path: any, options: any, print: Function) {
     );
 }
 
-function printLiteral(path: any, options: any, print: Function) {
+function printLiteral(path: any, options: any, _print: Function) {
     let node: parser.Expr.Literal = path.getValue();
     let valueString = node.value.toString();
     if (node.value.kind === types.ValueKind.String) {
@@ -32,7 +32,7 @@ function printLiteral(path: any, options: any, print: Function) {
     return valueString;
 }
 
-function printArrayLiteral(path: any, options: any, print: Function) {
+function printArrayLiteral(path: any, options: any, _print: Function) {
     return builders.group(
         builders.concat([
             '[',
@@ -40,12 +40,39 @@ function printArrayLiteral(path: any, options: any, print: Function) {
                 builders.concat([
                     builders.softline,
                     builders.join(
-                        builders.concat([',', builders.line]), path.map(print, 'elements')
+                        builders.concat([',', builders.line]), path.map(printBrs, 'elements')
                     )
                 ])
             ),
             builders.softline,
             ']'
+        ])
+    )
+}
+
+function printAAMember(path: any, options: any, _print: Function) {
+    let memberNode: AAMember = path.getValue();
+    return builders.concat([
+        memberNode.name.toString(),
+        ': ',
+        path.call(printBrs, 'value')
+    ]);
+}
+
+function printAALiteral(path: any, options: any, _print: Function) {
+    return builders.group(
+        builders.concat([
+            '{',
+            builders.indent(
+                builders.concat([
+                    builders.line,
+                    builders.join(
+                        builders.concat([',', builders.line]), path.map(printAAMember, 'elements')
+                    )
+                ])
+            ),
+            builders.line,
+            '}'
         ])
     )
 }
@@ -56,6 +83,7 @@ let nodeTypeToPrint: any = {
     "Assignment": printAssignment,
     "Literal": printLiteral,
     "ArrayLiteral": printArrayLiteral,
+    "AALiteral": printAALiteral,
 };
 
 let languages = [
@@ -76,7 +104,7 @@ let parsers = {
 
 let printers = {
     'brs-ast': {
-        print: prettyPrintBrs
+        print: printBrs
     }
 }
 // options: { printWidth: 120 }
