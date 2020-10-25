@@ -1,5 +1,4 @@
 import { parser, lexer, preprocessor, types } from "brs"
-import { AAMember } from "brs/types/parser/Expression";
 import prettier = require('prettier')
 
 function parse(code: string, options: any): object {
@@ -8,11 +7,14 @@ function parse(code: string, options: any): object {
     let pp = new preprocessor.Preprocessor();
     let preprocessorResults = pp.preprocess(scanResults.tokens, manifest);
     let ast = parser.Parser.parse(preprocessorResults.processedTokens).statements;
-    return ast[0];
+    return ast;
 }
 
 function printBrs(path: any, options: any, print: Function) {
     let node = path.getValue();
+    if (Array.isArray(node)) {
+        return builders.concat(path.map(print))
+    }
     return nodeTypeToPrint[node.type](path, options, print);
 }
 
@@ -30,6 +32,11 @@ function printLiteral(path: any, options: any, _print: Function) {
         return `\"${valueString}\"`
     }
     return valueString;
+}
+
+function printVariable(path: any, options: any, _print: Function) {
+    let node: parser.Expr.Variable = path.getValue();
+    return node.name.text;
 }
 
 function printArrayLiteral(path: any, options: any, _print: Function) {
@@ -51,7 +58,7 @@ function printArrayLiteral(path: any, options: any, _print: Function) {
 }
 
 function printAAMember(path: any, options: any, _print: Function) {
-    let memberNode: AAMember = path.getValue();
+    let memberNode: parser.Expr.AAMember = path.getValue();
     return builders.concat([
         memberNode.name.toString(),
         ': ',
@@ -84,6 +91,7 @@ let nodeTypeToPrint: any = {
     "Literal": printLiteral,
     "ArrayLiteral": printArrayLiteral,
     "AALiteral": printAALiteral,
+    "Variable": printVariable,
 };
 
 let languages = [

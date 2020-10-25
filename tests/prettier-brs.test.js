@@ -66,4 +66,10 @@ describe('Assignment', () => {
         code = 'a = {\n  blah: {\n    foo: 2,\n    bar: "some string"\n  }\n}\n'
         expect(format(code, { printWidth: 20 })).toBe(code)
     });
+
+    test('formats variables', () => {
+        let code = 'a = 32\nb = a\n'
+        console.log(format(code))
+        expect(format(code)).toBe(code)
+    });
 })
