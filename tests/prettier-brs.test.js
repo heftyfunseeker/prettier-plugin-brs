@@ -4,6 +4,7 @@ function format(code, additionalOptions = {}) {
     options = {
         parser: "brs-parse",
         plugins: ["."],
+        tabWidth: 4,
         ...additionalOptions,
     }
     return prettier.format(code, options);
@@ -39,7 +40,12 @@ describe('Assignment', () => {
     });
 
     test('formats line breaks of array', () => {
-        let code = `a = [\n  0,\n  ["blah", false],\n  invalid\n]\n`
+        let code =
+`a = [
+    0,
+    ["blah", false],
+    invalid
+]\n`
         expect(format(code, { printWidth: 20})).toBe(code)
     });
 
@@ -56,20 +62,31 @@ describe('Assignment', () => {
         expect(format(code)).toBe(code)
     });
 
-    // a = {
-    //     blah: {
-    //         foo: 2,
-    //         bar: "some string"
-    //     }
-    // }
     test('formats line breaks of AA literals', () => {
-        code = 'a = {\n  blah: {\n    foo: 2,\n    bar: "some string"\n  }\n}\n'
+        code =
+`a = {
+    blah: {
+        foo: 2,
+        bar: "some string"
+    }
+}\n`
         expect(format(code, { printWidth: 20 })).toBe(code)
     });
 
     test('formats variables', () => {
         let code = 'a = 32\nb = a\n'
-        console.log(format(code))
         expect(format(code)).toBe(code)
+
+        code =
+`stringVar = "..."
+a = {
+    blah: {
+        foo: [1, 2, 3],
+        bar: {
+            some: stringVar
+        }
+    }
+}\n`
+        expect(format(code, { printWidth: 25 })).toBe(code)
     });
 })

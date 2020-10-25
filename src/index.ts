@@ -1,5 +1,7 @@
 import { parser, lexer, preprocessor, types } from "brs"
+
 import prettier = require('prettier')
+let builders = prettier.doc.builders;
 
 function parse(code: string, options: any): object {
     let manifest = preprocessor.getManifestSync(process.cwd());
@@ -83,8 +85,6 @@ function printAALiteral(path: any, options: any, _print: Function) {
         ])
     )
 }
-
-let builders = prettier.doc.builders;
 
 let nodeTypeToPrint: any = {
     "Assignment": printAssignment,
