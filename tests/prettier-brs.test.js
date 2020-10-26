@@ -10,7 +10,7 @@ function format(code, additionalOptions = {}) {
     return prettier.format(code, options);
 }
 
-describe('Assignment', () => {
+describe('Expressions and Assigment', () => {
     test('formats literals', () => {
         let code = 'a = 32\n'
         expect(format(code)).toBe(code)
@@ -39,7 +39,7 @@ describe('Assignment', () => {
         expect(format(code)).toBe(code)
     });
 
-    test('formats line breaks of array', () => {
+    test('formats long array literals', () => {
         let code =
 `a = [
     0,
@@ -62,7 +62,7 @@ describe('Assignment', () => {
         expect(format(code)).toBe(code)
     });
 
-    test('formats line breaks of AA literals', () => {
+    test('formats long AA literals', () => {
         code =
 `a = {
     blah: {
@@ -88,5 +88,45 @@ a = {
     }
 }\n`
         expect(format(code, { printWidth: 25 })).toBe(code)
+    });
+
+    test('formats binary expressions', () => {
+        let code = 'a = b and c\n'
+        expect(format(code)).toBe(code)
+
+        code = 'a = b or c\n'
+        expect(format(code)).toBe(code)
+
+        code = 'a = b = c or b = d\n'
+        expect(format(code)).toBe(code)
+    });
+
+    test('formats groupings', () => {
+        let code = 'a = ((b and c) or d) and (e = f)\n'
+        expect(format(code)).toBe(code)
+    });
+
+    test('formats calls with no args', () => {
+        let code = 'a = somefunc()\n'
+        expect(format(code)).toBe(code)
+    });
+
+    test('formats calls with args', () => {
+        let code = 'a = somefunc(b)\n'
+        expect(format(code)).toBe(code)
+
+        code = 'a = somefunc(b, [0, 1, 2], { foo: "bar" })\n'
+        expect(format(code)).toBe(code)
+    });
+
+    test('formats calls with long args', () => {
+        // @fix line breaks
+        // let code = 'a = somefunc(b, [0, 1, 2], { foo: "bar" })\n'
+        // expect(format(code, { printWidth: 20 })).toBe(code)
+    });
+
+    test('formats dotted gets', () => {
+        let code = 'a = someObj.foo\n'
+        expect(format(code)).toBe(code)
     });
 })

@@ -15,7 +15,7 @@ function parse(code: string, options: any): object {
 function printBrs(path: any, options: any, print: Function) {
     let node = path.getValue();
     if (Array.isArray(node)) {
-        return builders.concat(path.map(print))
+        return builders.concat(path.map(print));
     }
     return nodeTypeToPrint[node.type](path, options, print);
 }
@@ -56,7 +56,7 @@ function printArrayLiteral(path: any, options: any, _print: Function) {
             builders.softline,
             ']'
         ])
-    )
+    );
 }
 
 function printAAMember(path: any, options: any, _print: Function) {
@@ -83,15 +83,74 @@ function printAALiteral(path: any, options: any, _print: Function) {
             builders.line,
             '}'
         ])
-    )
+    );
+}
+
+function printBinary(path: any, options: any, print: Function) {
+    let binaryNode: parser.Expr.Binary = path.getValue();
+    return builders.group(
+        builders.concat([
+            path.call(print, 'left'),
+            builders.line,
+            binaryNode.token.text,
+            builders.line,
+            path.call(print, 'right')
+        ])
+    );
+}
+
+
+function printGrouping(path: any, options: any, print: Function) {
+    let groupingNode: parser.Expr.Grouping = path.getValue();
+    return builders.group(
+        builders.concat([
+            groupingNode.tokens.left.text,
+            builders.softline,
+            path.call(print, 'expression'),
+            builders.softline,
+            groupingNode.tokens.right.text,
+        ])
+    );
+}
+
+function printCall(path: any, options: any, print: Function) {
+    let callNode: parser.Expr.Call = path.getValue();
+
+    // @fix line breaks
+    return builders.group(
+        builders.concat([
+            path.call(print, 'callee'),
+            '(',
+            builders.join(', ', path.map(print, 'args')),
+            ')'
+        ])
+    );
+}
+
+function printDottedGet(path: any, options: any, print: Function) {
+    let dottedGetNode: parser.Expr.DottedGet = path.getValue();
+    return builders.group(
+        builders.concat([
+            path.call(print, 'obj'),
+            '.',
+            dottedGetNode.name.text
+        ])
+    );
 }
 
 let nodeTypeToPrint: any = {
+    // Statements
     "Assignment": printAssignment,
+
+    // Expressions
     "Literal": printLiteral,
     "ArrayLiteral": printArrayLiteral,
     "AALiteral": printAALiteral,
     "Variable": printVariable,
+    "Binary": printBinary,
+    "Grouping": printGrouping,
+    "Call": printCall,
+    "DottedGet": printDottedGet,
 };
 
 let languages = [
